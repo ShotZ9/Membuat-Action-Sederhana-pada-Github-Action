@@ -1,0 +1,45 @@
+name: ML CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-train-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Checkout repository
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    # 2. Setup Python
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+
+    # 3. Install dependencies
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    # 4. Linting dan Unit Test
+    - name: Run Tests
+      run: |
+        pytest tests/ --maxfail=1 --disable-warnings -q
+
+    # 5. Train Model (contoh sederhana)
+    - name: Train Model
+      run: |
+        python train.py
+
+    # 6. Upload Model Artifact
+    - name: Upload Model Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: trained-model
+        path: models/model.pkl
